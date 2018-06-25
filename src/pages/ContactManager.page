@@ -1,0 +1,134 @@
+<apex:page controller="ContactsManagerController" docType="html-5.0" tabStyle="Contact">
+<!--apex:page standardController="Contact" extensions="ContactsManagerController"-->
+    
+    <apex:sectionHeader title="Contact" subtitle="Contact Manager" />
+    <apex:form >
+        
+        <apex:pageBlock rendered="true" id="showmsg" mode="maindetail">          
+         
+            <!-- Messages -->
+            <apex:outputPanel title="">
+                <apex:pageMessages ></apex:pageMessages>
+            </apex:outputPanel>
+            
+            <apex:pageBlockSection title="All Contacts" collapsible="false" >
+                <!-- Search block-->
+                <apex:outputPanel >
+                	<apex:outputLabel value="First / Last Name: " for="con" id="label"/>
+            		<apex:inputText value="{!searchString}" title="First / Last Name" id="con"/>&nbsp;
+            		<apex:commandButton action="{!Search}" title=" Search records by criteria" value=" Search " rendered="true" />
+            	</apex:outputPanel>
+                
+                <!-- New Contact button-->
+                <apex:outputPanel style="float:right">
+                <apex:commandButton action="{!newContact}" title=" New Contact " value=" New Contact " rendered="true" />
+                </apex:outputPanel>
+            </apex:pageBlockSection>
+            
+            <!-- Navigation/Pagination block -->
+            <apex:pageBlockButtons location="bottom" title="Navigation" >
+                <!-- Navigaton buttons -->
+                <apex:commandButton action="{!First}" title="First page"    value="First" rendered="true" disabled="{!currentPage==1}"/>
+                <apex:commandButton action="{!Prev}"  title="Previous page" value="Prev"  rendered="true" disabled="{!currentPage==1}"/>
+                
+                <!-- Page bumber information -->
+                <apex:outputPanel style="float:center;">
+                    <apex:outputText > Page {!currentPage} of {!pageCount} </apex:outputText>
+                </apex:outputPanel>  
+                
+                <!-- Navigaton buttons -->
+                <apex:commandButton action="{!Next}" title="Next page" value="Next" rendered="true" disabled="{!currentPage==pageCount}"/>
+                <apex:commandButton action="{!End}"  title="Last page" value="Last" rendered="true" disabled="{!currentPage==pageCount}"/>
+                
+                <!-- Page count records for pagination -->
+                <apex:outputPanel style="float:right;">
+                	Items per page:&nbsp;
+                	<apex:selectList value="{!pageSize}" size="1" onchange="setItemsPerPage();" title="Records per page">
+                    	<apex:selectOptions value="{!pageSizeItems}"/>
+                	</apex:selectList>
+                	<apex:actionFunction name="setItemsPerPage" action="{!setItemsPerPage}"/>
+                	&nbsp;
+                </apex:outputPanel>                  
+            </apex:pageBlockButtons>
+            
+            <!-- Contacts list block -->
+            <apex:pageBlockSection title="Contacts Information" collapsible="false" columns="1"> 
+            <apex:pageBlockTable value="{!contactsList}" var="item" id="contactTable">
+                <!-- Columns -->
+                <apex:column >
+                    <apex:facet name="header">
+                        <!-- Change ordering -->
+                        <apex:commandLink value="Name" action="{!setOrderIndex}" reRender="contactTable">
+                            <apex:param name="orderIndex" value="0" assignTo="{!orderIndex}" />
+                        </apex:commandLink>
+                    </apex:facet>
+                    <apex:outputLink value="/{!item.id}">
+                        <apex:outputField value="{!item.name}" />
+                    </apex:outputLink>
+                </apex:column>
+                
+                <apex:column >
+                    <apex:facet name="header">
+                        <apex:commandLink value="Email" action="{!setOrderIndex}" reRender="contactTable">
+                            <apex:param name="orderIndex" value="1" assignTo="{!orderIndex}" />
+                        </apex:commandLink>
+                    </apex:facet>
+                    <apex:outputField value="{!item.email}" />
+                </apex:column>
+                
+                <apex:column >
+                    <apex:facet name="header">
+                        <apex:commandLink value="Contact Level" action="{!setOrderIndex}" reRender="contactTable">
+                            <apex:param name="orderIndex" value="2" assignTo="{!orderIndex}" />
+                        </apex:commandLink>
+                    </apex:facet>
+                    <apex:outputField value="{!item.Contact_Level__c}" />
+                </apex:column>
+                
+                <apex:column >
+                    <apex:facet name="header">
+                        <apex:commandLink value="Account" action="{!setOrderIndex}" reRender="contactTable">
+                            <apex:param name="orderIndex" value="3" assignTo="{!orderIndex}" />
+                        </apex:commandLink>
+                    </apex:facet>
+                    <apex:outputField value="{!item.Account.Name}" />
+                </apex:column>
+                
+                <apex:column >
+                    <apex:facet name="header">
+                        <apex:commandLink value="Owner" action="{!setOrderIndex}" reRender="contactTable">
+                            <apex:param name="orderIndex" value="4" assignTo="{!orderIndex}" />
+                        </apex:commandLink>
+                    </apex:facet>
+                    <apex:outputField value="{!item.Owner.name}" />
+                </apex:column>
+                
+                <apex:column >
+                    <apex:facet name="header">
+                        <apex:commandLink value="Created By" action="{!setOrderIndex}" reRender="contactTable">
+                            <apex:param name="orderIndex" value="5" assignTo="{!orderIndex}" />
+                        </apex:commandLink>
+                    </apex:facet>
+                    <apex:outputField value="{!item.CreatedBy.Name}" />
+                </apex:column>
+                
+                <apex:column >
+                    <apex:facet name="header">
+                        <apex:commandLink value="Created date" action="{!setOrderIndex}" reRender="contactTable">
+                            <apex:param name="orderIndex" value="6" assignTo="{!orderIndex}" />
+                        </apex:commandLink>
+                    </apex:facet>
+                    <apex:outputField value="{!item.CreatedDate}" />
+                </apex:column>
+                <apex:column >
+                    <!-- Delete current record button -->
+                    <apex:commandButton action="{!del}" title=" Delete current record " value=" Del " reRender="showmsg" rendered="true" 
+                                        onclick="if(!confirm('You are trying to delete the entry. Are you sure?')){return false};">
+                        <apex:param name="contactId" assignTo="{!contactId}" value="{!item.Id}"/>
+                    </apex:commandButton>
+                </apex:column>
+            </apex:pageBlockTable>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+     </apex:form>
+</apex:page>
