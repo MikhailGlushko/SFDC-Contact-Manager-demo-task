@@ -19,6 +19,18 @@ public class ContactsManagerControllerTest {
     }
     
     /**
+     * This test method validate the correct creation of the ContactsManagerController
+     */ 
+    @isTest
+    static void testConstructor(){
+    	ContactsManagerController cmc = new ContactsManagerController();
+        System.assertEquals(5, cmc.pageSizeItems.size());
+        System.assertEquals(10, cmc.pageSize);
+        System.assertEquals('', cmc.searchString);
+        System.assertEquals(0, cmc.orderIndex);
+    }
+    
+    /**
      * This test method checks the operation of pagination
      */ 
     @isTest

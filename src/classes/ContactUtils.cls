@@ -11,15 +11,16 @@ public with sharing class ContactUtils {
      * @param newList List collection of Contact records to execute logic on
      */
     public static void afterInsert(List<Contact> newList){
-        // create accountIds set for all new created Contacts 
+        // create collection of accountIds for all new created Contacts 
+        // using input collection of Contacts
         Set<Id>  accountIds = new Set<Id>();      
         for(Contact con: newList){
             if(con.AccountId!=null){
                 accountIds.add(con.AccountId);
             }
         }
-        
-        // create map Account.Id => Account.ownerid  
+        // create map Account.Id => Account.ownerid 
+        // using collection of "accountIds" and Accounts 
         Map<Id,Id> accountMap = new Map<Id,Id>();
         if(accountIds!=null && accountIds.size()!=0){
         	for(Account acc: [select Id, OwnerId from Account where Id in :accountIds]){
@@ -27,7 +28,8 @@ public with sharing class ContactUtils {
         	}
     	}
         
-		// create new Case for for all new Contacts        
+		// create collection of Case to be autocreated for for all new Contacts
+		// using input collection of Contacts and "accountMap"        
     	List<Case> caseList = new List<Case>();
     	for(Contact con: newList){
         	caseList.add(new Case(ContactId = con.id,
@@ -39,9 +41,10 @@ public with sharing class ContactUtils {
                                  ));
     	}
         
-        // insert prepared Cases
+        // insert prepared Cases to databese
         if(caseList!=null && caseList.size()!=0){
        		insert caseList;
+            // show information in message section on page
            	if(ApexPages.currentPage()!=null){
            		ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.INFO,
                    	                                       'Cases #'+caseList+' was created'
@@ -56,22 +59,14 @@ public with sharing class ContactUtils {
      * on the before delete event
      * @param newList List collection of Contact records to execute logic on
      */
-    public static void beforeDelete(List<Contact> newList){
-		// create deleted Contacts list
-        List<Contact> contactList = new List<Contact>();
-        for(Contact con: newList){
-        	contactList.add(con);        
-        }
-        
-        // create Case list to be delete with Contacts
-        List<Case> caseList = new List<Case>(); 
-        if(contactList!=null && contactList.size()!=0){
-        	caseList = [select Id, ContactId from Case where ContactId in :contactList];
-    	}
+    public static void beforeDelete(List<Contact> newList){     
+        // create collection of Cases to be delete with Contacts
+        List<Case> caseList = [select Id, ContactId from Case where ContactId in :newList];
         
         // delete exists cases
         if(caseList!=null && caseList.size()!=0){
             delete caseList;
+            // show information in message section on pahe
             if(ApexPages.currentPage()!=null){
             	ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.INFO,
                     	                                   'Cases #'+caseList+' was deleted'
