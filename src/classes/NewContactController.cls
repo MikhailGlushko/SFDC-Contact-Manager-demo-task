@@ -9,7 +9,7 @@ public with sharing class NewContactController {
     private String reffererPage;
     private Contact newContact {get; set;}
     
-    // cunstructor
+    // cunstructor with standatd controller
     public NewContactController(ApexPages.StandardController controller){
         // get contact information from StandardController
        	this.newContact = (Contact)controller.getRecord(); 
@@ -17,26 +17,21 @@ public with sharing class NewContactController {
         this.reffererPage = ApexPages.currentPage().getHeaders().get('Referer');
     }
 
-    // save command
+    // save command - inserd prepared record of new Contact to database
     public Pagereference save(){
         //seve new conact
-        try{
-    		insert newContact;
-        }
-        catch(DmlException ex){
-       		ApexPages.addMessages(ex);
-    	}
-        //redirect
+   		insert newContact;
+        //redirect to previous page (Contact Manager Page)
 		return redirect();
     }
     
-    //cancel command
+    //cancel command - do nothing
     public Pagereference cancel(){
-        // redirect
+        // redirect to previous page (Contact Manager Page)
 		return redirect();
     }
     
-    // redirect command
+    // redirect command - redirect to refferer page (Contact Manager Page)
     private Pagereference redirect(){
         PageReference pr = new PageReference(reffererPage);
         pr.setRedirect(true);

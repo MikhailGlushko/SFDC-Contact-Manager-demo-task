@@ -3,7 +3,7 @@
  * @autor Mikhail Glushko, 2018
  */
 @isTest
-public class TEST_ContactsManagerController {
+public class ContactsManagerControllerTest {
 	/**
 	 *	@desctiption This test method checks in general the addition of new records 
 	 */ 
@@ -73,6 +73,11 @@ public class TEST_ContactsManagerController {
         result = cmc.contactsList;
         System.assertEquals(old[0], result[0]);
         System.assertNotEquals(old[0], result[result.size()-1]);
+        
+        cmc.orderIndex = 1;
+        cmc.setOrderIndex();
+        result = cmc.contactsList;
+        System.assertNotEquals(old, result);
     }
     
     /**
@@ -116,5 +121,12 @@ public class TEST_ContactsManagerController {
         cmc.del();
         List<Contact> newResult = cmc.contactsList;
         System.assertEquals(result[0], newResult[0]);
+    }
+    
+    @isTest
+    static void testNewContact(){
+        ContactsManagerController cmc = new ContactsManagerController();
+        PageReference page = cmc.newContact();     
+        System.assertEquals(new PageReference('/apex/NewContact').getUrl(), page.getUrl());     
     }
 }

@@ -27,16 +27,16 @@
             
             <!-- Navigation/Pagination block -->
             <apex:pageBlockButtons location="bottom" title="Navigation" >
-                <!-- Navigaton buttons -->
+                <!-- Navigation buttons -->
                 <apex:commandButton action="{!First}" title="First page"    value="First" rendered="true" disabled="{!currentPage==1}"/>
                 <apex:commandButton action="{!Prev}"  title="Previous page" value="Prev"  rendered="true" disabled="{!currentPage==1}"/>
                 
-                <!-- Page bumber information -->
+                <!-- Page number information -->
                 <apex:outputPanel style="float:center;">
                     <apex:outputText > Page {!currentPage} of {!pageCount} </apex:outputText>
                 </apex:outputPanel>  
                 
-                <!-- Navigaton buttons -->
+                <!-- Navigation buttons -->
                 <apex:commandButton action="{!Next}" title="Next page" value="Next" rendered="true" disabled="{!currentPage==pageCount}"/>
                 <apex:commandButton action="{!End}"  title="Last page" value="Last" rendered="true" disabled="{!currentPage==pageCount}"/>
                 

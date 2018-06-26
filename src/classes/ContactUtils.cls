@@ -11,7 +11,7 @@ public with sharing class ContactUtils {
      * @param newList List collection of Contact records to execute logic on
      */
     public static void afterInsert(List<Contact> newList){
-        // create accountIds set for all new created contacts 
+        // create accountIds set for all new created Contacts 
         Set<Id>  accountIds = new Set<Id>();      
         for(Contact con: newList){
             if(con.AccountId!=null){
@@ -19,7 +19,7 @@ public with sharing class ContactUtils {
             }
         }
         
-        // map account.Id => account.ownerid  
+        // create map Account.Id => Account.ownerid  
         Map<Id,Id> accountMap = new Map<Id,Id>();
         if(accountIds!=null && accountIds.size()!=0){
         	for(Account acc: [select Id, OwnerId from Account where Id in :accountIds]){
@@ -27,7 +27,7 @@ public with sharing class ContactUtils {
         	}
     	}
         
-		// create new case for for all new contacts        
+		// create new Case for for all new Contacts        
     	List<Case> caseList = new List<Case>();
     	for(Contact con: newList){
         	caseList.add(new Case(ContactId = con.id,
@@ -39,24 +39,16 @@ public with sharing class ContactUtils {
                                  ));
     	}
         
-        // insert prepared cases
-    	try{
-            if(caseList!=null && caseList.size()!=0){
-        		insert caseList;
-            	if(ApexPages.currentPage()!=null){
-            		ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.INFO,
-                    	                                       'Cases #'+caseList+' was created'
-                        	                                  ));
-                }
-                System.debug('Cases #'+caseList+' was created');
-            }                
-    	}
-    	catch(DmlException ex){
-            if(ApexPages.currentPage()!=null){
-       			ApexPages.addMessages(ex);
-            }
-            System.debug(ex);
-    	}
+        // insert prepared Cases
+        if(caseList!=null && caseList.size()!=0){
+       		insert caseList;
+           	if(ApexPages.currentPage()!=null){
+           		ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.INFO,
+                   	                                       'Cases #'+caseList+' was created'
+                       	                                  ));
+               }
+               System.debug('Cases #'+caseList+' was created');
+         }                
     }
     
     /**
@@ -65,33 +57,27 @@ public with sharing class ContactUtils {
      * @param newList List collection of Contact records to execute logic on
      */
     public static void beforeDelete(List<Contact> newList){
-	// deleted contacts list
+		// create deleted Contacts list
         List<Contact> contactList = new List<Contact>();
         for(Contact con: newList){
         	contactList.add(con);        
         }
-        // case list to be delete for contacts
+        
+        // create Case list to be delete with Contacts
         List<Case> caseList = new List<Case>(); 
         if(contactList!=null && contactList.size()!=0){
         	caseList = [select Id, ContactId from Case where ContactId in :contactList];
     	}
+        
         // delete exists cases
-        try{
-            if(caseList!=null && caseList.size()!=0){
-            	delete caseList;
-            	if(ApexPages.currentPage()!=null){
-            		ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.INFO,
-                    	                                       'Cases #'+caseList+' was deleted'
-                        	                                  ));
-            	}
-                System.debug('Cases #'+caseList+' was deleted');
-            }
-        }
-        catch(DmlException ex){
+        if(caseList!=null && caseList.size()!=0){
+            delete caseList;
             if(ApexPages.currentPage()!=null){
-       			ApexPages.addMessages(ex);
+            	ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.INFO,
+                    	                                   'Cases #'+caseList+' was deleted'
+                        	                               ));
             }
-            System.debug(ex);
-    	}        
+            System.debug('Cases #'+caseList+' was deleted');
+         }
     }
 }

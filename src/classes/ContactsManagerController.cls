@@ -5,16 +5,21 @@
  * @autor Mikhail Glushko, 2018 
  * @version 1 
  */ 
-public with sharing class ContactsManagerController {     
+public with sharing class ContactsManagerController {
+    // New Contact page
     private final String NEW_CONTACT_PAGE = '/apex/NewContact';
     
-    //list of contactsList
+    //list of Contacts
     public  List<Contact> contactsList  {get; private set;}
+    //list of fields to be getted from database (for ordering logic)
     private List<String>  contactsFieldList {get; private set;}
+    // total count records
     private integer contactsListCount   {get;set;}
+    // offset for pagination
     private integer contactsListOffset  {get;set;}
     // ordering
     public  integer orderIndex     {get;set;}
+    // order direction
     private String  orderDirection {get;set;}
     private integer prevOrderIndex  = 0;
     // pagination
@@ -23,13 +28,13 @@ public with sharing class ContactsManagerController {
     public  integer pageSize    {get;set;}
     public  integer pageCount   {get;set;}
     public  integer currentPage {get;set;} 
-    //
+    // for deleting and searching commands
     public String contactId    {get;set;}
     public String searchString {get;set;}
     
-    //constructor
+    //constructor without standatd controller
     public ContactsManagerController(){
-        // set fields list
+        // create fields list
 		this.contactsFieldList = new List<String>{'Name',
             									  'Email',
             									  'Contact_Level__c', 
@@ -37,7 +42,7 @@ public with sharing class ContactsManagerController {
             									  'Owner.Name', 
             								      'CreatedBy.Name', 
             									  'CreatedDate'};
-        //set count items per page allowable values
+        //create count items per page allowable values list
         this.pageSizeItems = new List<SelectOption>{
             								   new SelectOption('5','5'),
             								   new SelectOption('10','10'),
@@ -48,7 +53,7 @@ public with sharing class ContactsManagerController {
         this.pageSize = Integer.valueOf(pageSizeItems.get(PAGE_SIZE_DEFAULT_INDEX).getValue());
         //set default filter to search
         this.searchString = '';
-        //set default column bumber to ordering 
+        //set default column number to ordering 
         this.orderIndex = 0;
         //set default direction to ordering
         this.orderDirection = 'ASC';
@@ -58,8 +63,9 @@ public with sharing class ContactsManagerController {
         getContactsList();  
     }
     
-    // get list of contactsList    
+    // make new list of contactsList using pagination and ordering    
     private void getContactsList(){
+        //refrech total records 
         getTotalRecords();
         // notnalize value to '' if null
         this.searchString = (searchString==null) ? '' : searchString;
@@ -80,7 +86,7 @@ public with sharing class ContactsManagerController {
         // notnalize value to '' if null
         this.searchString = (searchString==null) ? '' : searchString;     
         // fetch total count from database
-        this.contactsListCount = Database.countQuery('select count() FROM contact '+' WHERE firstName like \'%'+searchString+'%\' OR lastName like \'%'+searchString+'%\' ');
+        this.contactsListCount = Database.countQuery('select count() FROM contact '+' WHERE firstName like \'%'+searchString+'%\' OR lastName like \'%'+searchString+'%\' ');       
         // calculate page count
         this.pageCount = ((contactsListCount / pageSize)*pageSize!=contactsListCount)
             ? (contactsListCount / pageSize+1) : (contactsListCount / pageSize);
@@ -128,9 +134,7 @@ public with sharing class ContactsManagerController {
                 this.orderDirection = 'DESC';
             else
                 this.orderDirection = 'ASC';
-        }
-        
-        if(prevOrderIndex!=orderIndex){
+        } else {
             this.prevOrderIndex=orderIndex;
             this.orderDirection = 'ASC';
         }
@@ -145,17 +149,10 @@ public with sharing class ContactsManagerController {
         // get contact by Id
         Contact cnt = [select Id from contact where Id = :contactId];
         // delete contact
-        try{
-        	delete cnt;
-            if(ApexPages.currentPage()!=null){
+        delete cnt;
+        if(ApexPages.currentPage()!=null){
             	ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.INFO,'Contact #'+contactId+' was deleted'));
-            }
-        } 
-        catch(DmlException ex){
-            if(ApexPages.currentPage()!=null){
-        		ApexPages.addMessages(ex);
-            }
-    	}
+        }
         //rebuild contacts list
         getContactsList();
     }
